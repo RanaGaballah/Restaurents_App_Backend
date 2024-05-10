@@ -13,24 +13,16 @@ class SearchController extends Controller
     public function searchByProduct(Request $request)
     {
         $productName = $request->input('product_name');
-
-        // Find all products that match the query
         $products = Product::where('product_name', 'like', '%' . $productName . '%')->get();
-
-        // If no products found, return 404 response
         if ($products->isEmpty()) {
             return response()->json(['message' => 'No products found for the given search query'], 404);
         }
-
-        // Prepare an array to store the result data
         $responseData = [];
-
-        // Iterate over each product to find the restaurants that have it
         foreach ($products as $product) {
             $restaurantProducts = RestaurantProduct::where('product_id', $product->id)->get();
             $restaurants = [];
 
-            // Retrieve restaurant data for each product
+            
             foreach ($restaurantProducts as $restaurantProduct) {
                 $restaurant = Restaurant::find($restaurantProduct->restaurant_id);
                 if ($restaurant) {
@@ -38,14 +30,13 @@ class SearchController extends Controller
                 }
             }
 
-            // Add product and associated restaurants to the response data
             $responseData[] = [
                 'product' => $product,
                 'restaurants' => $restaurants
             ];
         }
 
-        // Return the response with the product and associated restaurants
+       
         return response()->json([
             'message' => 'Retrieved restaurants for search product successfully',
             'products' => $responseData
