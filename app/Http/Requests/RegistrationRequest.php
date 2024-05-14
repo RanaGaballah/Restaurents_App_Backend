@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class RegistrationRequest extends FormRequest
 {
@@ -46,5 +48,20 @@ class RegistrationRequest extends FormRequest
             'confirm_password.min' => 'The confirm password must be at least 8 characters.',
             'confirm_password.same' => 'The confirm password and password must match.',
         ];
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        $errors = $validator->errors()->toArray();
+        $message = 'Validation error.';
+
+        if (count($errors) > 1) {
+            $message .= ' (' . count($errors) . ' more errors)';
+        }
+
+        throw new HttpResponseException(response()->json([
+            'message' => $message,
+            'errors' => $errors
+        ], 200));
     }
 }
