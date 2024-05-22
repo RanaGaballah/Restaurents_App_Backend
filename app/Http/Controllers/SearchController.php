@@ -21,18 +21,20 @@ class SearchController extends Controller
         foreach ($products as $product) {
             $restaurantProducts = RestaurantProduct::where('product_id', $product->id)->get();
             $restaurants = [];
-
-            
             foreach ($restaurantProducts as $restaurantProduct) {
                 $restaurant = Restaurant::find($restaurantProduct->restaurant_id);
                 if ($restaurant) {
                     $restaurants[] = $restaurant;
                 }
             }
-
             $responseData[] = [
-                'product' => $product,
+                'id' => $product->id,
+                'product_name' => $product->product_name,
+                'description' => $product->description,
+                'price' => $product->price,
+                'image_url' => $product->image_url,
                 'restaurants' => $restaurants
+
             ];
         }
 
